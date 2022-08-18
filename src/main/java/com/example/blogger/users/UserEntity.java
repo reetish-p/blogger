@@ -13,21 +13,21 @@ import javax.persistence.Entity;
 @RequiredArgsConstructor
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity(name = "users")
 public class UserEntity extends BaseEntity {
-
-	private String bio;
-	private String avatar;
 
 	@Column(nullable = false,unique = true)
 	@NonNull
 	private String email;
 
+	@Column(nullable = false, unique = true)
+	@NonNull
+	private String username;
+
 	@Column(nullable = false)
 	@NonNull
 	private String password;
 
-	@Column(nullable = false, unique = true)
-	@NonNull
-	private String username;
+	private String bio;
+	private String avatar;
 }

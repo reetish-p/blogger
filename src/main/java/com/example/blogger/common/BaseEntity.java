@@ -16,6 +16,6 @@ public abstract class BaseEntity {
     private int id;
 
     @CreatedDate
-    @Column(name="created_date")
+    @Column(name="created_at")
     private Date createdAt;
 }

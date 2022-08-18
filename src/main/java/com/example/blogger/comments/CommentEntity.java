@@ -18,7 +18,7 @@ import javax.persistence.ManyToOne;
 @RequiredArgsConstructor
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity(name = "comments")
 public class CommentEntity extends BaseEntity {
 	private String title;
 

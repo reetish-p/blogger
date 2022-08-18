@@ -1,11 +1,9 @@
 package com.example.blogger.users;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.Banner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class UsersService {
@@ -21,6 +19,7 @@ public class UsersService {
 
     /* Sign up */
     public  UserDTO.LoginUserResponse signUpUser(UserDTO.CreateUserRequest user){
+        //TODO: validate invalid inputs
         UserEntity userEntity = modelMapper.map(user,UserEntity.class);
         UserEntity savedUser = usersRepository.save(userEntity);
         UserDTO.LoginUserResponse response = modelMapper.map(savedUser,UserDTO.LoginUserResponse.class);
@@ -32,9 +31,8 @@ public class UsersService {
         UserEntity userEntity = usersRepository.findByUsername(user.getUsername()).orElseThrow(
                 () -> new UserNotFoundException(user.getUsername())
         );
-        System.out.println("------");
-        //Hashing
-        if(userEntity.getPassword().equals(user.getPassword())) //TODO
+        //TODO: match password using Hashing
+        if(userEntity.getPassword().equals(user.getPassword()))
         {
             UserDTO.LoginUserResponse response = modelMapper.map(userEntity,UserDTO.LoginUserResponse.class);
             response.setToken(jwtService.createJwtToken(response.getUsername()));
@@ -49,6 +47,13 @@ public class UsersService {
                 () -> new UserNotFoundException(username)
         );
         return modelMapper.map(userEntity,UserDTO.GetUserResponse.class);
+    }
+
+    public UserEntity getUserEntityByUsername(String username){
+        UserEntity userEntity = usersRepository.findByUsername(username).orElseThrow(
+                () -> new UserNotFoundException(username)
+        );
+        return userEntity;
     }
 
     static class UserNotFoundException extends RuntimeException{

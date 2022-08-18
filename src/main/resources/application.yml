@@ -1,5 +1,5 @@
 server:
-  port: 8282
+  port: 8080
 spring:
   jpa:
     hibernate:
@@ -12,3 +12,4 @@ logging:
     org:
       hibernate:
         SQL: DEBUG
+debug: true

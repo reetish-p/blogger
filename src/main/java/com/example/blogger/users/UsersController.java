@@ -1,8 +1,8 @@
 package com.example.blogger.users;
 
 import com.example.blogger.common.ErrorDTO;
-import org.apache.catalina.User;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -10,6 +10,7 @@ import java.net.URI;
 @RestController
 @RequestMapping("/users")
 public class UsersController {
+
     private UsersService usersService;
 
     public UsersController(UsersService usersService) {
@@ -36,7 +37,8 @@ public class UsersController {
 
     @GetMapping("/@{username}")
     ResponseEntity<UserDTO.GetUserResponse> getUser(
-            @PathVariable("username") String username
+            @PathVariable("username") String username//,
+            //@AuthenticationPrincipal UserEntity authenticatedUser
     ){
         var response = usersService.getUserByUsername(username);
         return ResponseEntity.ok(response);
@@ -44,6 +46,7 @@ public class UsersController {
 
     @ExceptionHandler
     ResponseEntity<ErrorDTO> exceptionHandler(Exception e){
+        System.out.println("In exception class");
         if(e instanceof UsersService.UserNotFoundException)
             return ResponseEntity.status(404).body(new ErrorDTO(e.getMessage()));
         if(e instanceof UsersService.UserAuthenticationException)

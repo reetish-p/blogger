@@ -15,7 +15,7 @@ import javax.persistence.*;
 @RequiredArgsConstructor
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity(name = "articles")
 public class ArticleEntity extends BaseEntity {
 
 	@Column(nullable = false)

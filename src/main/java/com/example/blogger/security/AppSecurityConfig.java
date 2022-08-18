@@ -19,10 +19,12 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST,"/users","/users/login").permitAll()
+                .antMatchers("/h2-console/**").permitAll() //to unblock H2-console
                // .antMatchers(HttpMethod.GET, "/articles").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(jwtAuthenticationFilter, AnonymousAuthenticationFilter.class);
+        http.headers().frameOptions().disable(); //to view frames/UI in H2-console
     }
 
     @Override

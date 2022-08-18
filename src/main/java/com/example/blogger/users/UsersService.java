@@ -1,8 +1,8 @@
 package com.example.blogger.users;
 
 import org.modelmapper.ModelMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -10,6 +10,10 @@ public class UsersService {
     private UsersRepository usersRepository;
     private ModelMapper modelMapper;
     private UserJwtService jwtService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
 
     public UsersService(UsersRepository usersRepository, ModelMapper modelMapper, UserJwtService jwtService) {
         this.usersRepository = usersRepository;
@@ -21,6 +25,7 @@ public class UsersService {
     public  UserDTO.LoginUserResponse signUpUser(UserDTO.CreateUserRequest user){
         //TODO: validate invalid inputs
         UserEntity userEntity = modelMapper.map(user,UserEntity.class);
+        userEntity.setPassword(passwordEncoder.encode(user.getPassword()));
         UserEntity savedUser = usersRepository.save(userEntity);
         UserDTO.LoginUserResponse response = modelMapper.map(savedUser,UserDTO.LoginUserResponse.class);
         response.setToken(jwtService.createJwtToken(response.getUsername()));
@@ -32,7 +37,8 @@ public class UsersService {
                 () -> new UserNotFoundException(user.getUsername())
         );
         //TODO: match password using Hashing
-        if(userEntity.getPassword().equals(user.getPassword()))
+        //if(userEntity.getPassword().equals(user.getPassword()))
+        if(passwordEncoder.matches(user.getPassword(),userEntity.getPassword()))
         {
             UserDTO.LoginUserResponse response = modelMapper.map(userEntity,UserDTO.LoginUserResponse.class);
             response.setToken(jwtService.createJwtToken(response.getUsername()));

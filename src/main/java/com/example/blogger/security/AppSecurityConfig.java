@@ -18,9 +18,11 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
+                .antMatchers(HttpMethod.GET, "/articles", "/articles/*", "/articles/*/comments", "/tags").permitAll()
+                .and()
+                .authorizeRequests()
                 .antMatchers(HttpMethod.POST,"/users","/users/login").permitAll()
-                .antMatchers("/h2-console/**").permitAll() //to unblock H2-console
-               // .antMatchers(HttpMethod.GET, "/articles").permitAll()
+                .antMatchers("/h2-console/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(jwtAuthenticationFilter, AnonymousAuthenticationFilter.class);

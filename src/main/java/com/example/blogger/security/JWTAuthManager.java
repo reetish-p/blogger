@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class JWTAuthManager implements AuthenticationManager {
-    private UserJwtService userJwtService;
-    private UsersService usersService;
+    private final UserJwtService userJwtService;
+    private final UsersService usersService;
 
     public JWTAuthManager(UserJwtService userJwtService, UsersService usersService) {
         this.userJwtService = userJwtService;

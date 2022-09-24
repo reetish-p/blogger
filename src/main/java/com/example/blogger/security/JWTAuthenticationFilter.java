@@ -9,13 +9,7 @@ public class JWTAuthenticationFilter extends AuthenticationFilter {
 
     public JWTAuthenticationFilter(JWTAuthManager manager, JWTAuthConverter converter) {
         super(manager, converter);
-        //handles what happens when auth is successful
         this.setSuccessHandler((request,response,authentication) -> {
-            /*
-            the SecurityContextHolder is an object associated with every
-            request. When auth succeeds we store the 'authentication' object in the context
-            Controller can then extract the user (which is the principal) from the context
-             */
             SecurityContextHolder.getContext().setAuthentication(authentication);
         });
     }

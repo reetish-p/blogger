@@ -1,10 +1,9 @@
-package com.example.blogger.users;
+package com.example.blogger.users.dtos;
 
 import lombok.Data;
 
 public class UserDTO {
     private UserDTO(){
-
     }
 
     @Data

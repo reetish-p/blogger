@@ -1,6 +1,7 @@
 package com.example.blogger.users;
 
 import com.example.blogger.common.ErrorDTO;
+import com.example.blogger.users.dtos.UserDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -11,12 +12,11 @@ import java.net.URI;
 @RequestMapping("/users")
 public class UsersController {
 
-    private UsersService usersService;
+    private final UsersService usersService;
 
     public UsersController(UsersService usersService) {
         this.usersService = usersService;
     }
-
 
     @PostMapping("")
     ResponseEntity<UserDTO.LoginUserResponse> signUpUser(@RequestBody UserDTO.CreateUserRequest request){
@@ -35,18 +35,35 @@ public class UsersController {
     }
 
 
-    @GetMapping("/@{username}")
+    @GetMapping("/{username}")
     ResponseEntity<UserDTO.GetUserResponse> getUser(
-            @PathVariable("username") String username//,
-            //@AuthenticationPrincipal UserEntity authenticatedUser
+            @PathVariable("username") String username
     ){
         var response = usersService.getUserByUsername(username);
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/{username}/follow")
+    ResponseEntity<UserDTO.GetUserResponse> followUser(
+            @PathVariable("username") String username,
+            @AuthenticationPrincipal UserEntity userEntity
+    ) {
+        UserDTO.GetUserResponse response = usersService.followUser(username, userEntity.getId());
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{username}/follow")
+    ResponseEntity<UserDTO.GetUserResponse> unfollowUser(
+            @PathVariable("username") String username,
+            @AuthenticationPrincipal UserEntity userEntity
+    ) {
+        UserDTO.GetUserResponse response = usersService.unfollowUser(username, userEntity.getId());
+        return ResponseEntity.ok(response);
+    }
+
+
     @ExceptionHandler
     ResponseEntity<ErrorDTO> exceptionHandler(Exception e){
-        System.out.println("In exception class");
         if(e instanceof UsersService.UserNotFoundException)
             return ResponseEntity.status(404).body(new ErrorDTO(e.getMessage()));
         if(e instanceof UsersService.UserAuthenticationException)

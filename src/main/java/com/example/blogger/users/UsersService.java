@@ -1,43 +1,39 @@
 package com.example.blogger.users;
 
+import com.example.blogger.users.dtos.UserDTO;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UsersService {
-    private UsersRepository usersRepository;
-    private ModelMapper modelMapper;
-    private UserJwtService jwtService;
+    private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
+    private final UserJwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-
-    public UsersService(UsersRepository usersRepository, ModelMapper modelMapper, UserJwtService jwtService) {
-        this.usersRepository = usersRepository;
+    public UsersService(UserRepository userRepository, ModelMapper modelMapper, UserJwtService jwtService, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.jwtService = jwtService;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    /* Sign up */
     public  UserDTO.LoginUserResponse signUpUser(UserDTO.CreateUserRequest user){
         //TODO: validate invalid inputs
         UserEntity userEntity = modelMapper.map(user,UserEntity.class);
         userEntity.setPassword(passwordEncoder.encode(user.getPassword()));
-        UserEntity savedUser = usersRepository.save(userEntity);
+        UserEntity savedUser = userRepository.save(userEntity);
         UserDTO.LoginUserResponse response = modelMapper.map(savedUser,UserDTO.LoginUserResponse.class);
         response.setToken(jwtService.createJwtToken(response.getUsername()));
         return response;
     }
-    /* Login up */
+
     public  UserDTO.LoginUserResponse loginUser(UserDTO.LoginUserRequest user){
-        UserEntity userEntity = usersRepository.findByUsername(user.getUsername()).orElseThrow(
+        UserEntity userEntity = userRepository.findByUsername(user.getUsername()).orElseThrow(
                 () -> new UserNotFoundException(user.getUsername())
         );
-        //TODO: match password using Hashing
-        //if(userEntity.getPassword().equals(user.getPassword()))
+
         if(passwordEncoder.matches(user.getPassword(),userEntity.getPassword()))
         {
             UserDTO.LoginUserResponse response = modelMapper.map(userEntity,UserDTO.LoginUserResponse.class);
@@ -49,17 +45,28 @@ public class UsersService {
     }
 
     public UserDTO.GetUserResponse getUserByUsername(String username){
-        UserEntity userEntity = usersRepository.findByUsername(username).orElseThrow(
+        UserEntity userEntity = userRepository.findByUsername(username).orElseThrow(
                 () -> new UserNotFoundException(username)
         );
         return modelMapper.map(userEntity,UserDTO.GetUserResponse.class);
     }
 
     public UserEntity getUserEntityByUsername(String username){
-        UserEntity userEntity = usersRepository.findByUsername(username).orElseThrow(
+        return userRepository.findByUsername(username).orElseThrow(
                 () -> new UserNotFoundException(username)
         );
-        return userEntity;
+    }
+
+    public UserDTO.GetUserResponse followUser(String username, Integer loggedInUserUserId) {
+        UserDTO.GetUserResponse userToFollow = getUserByUsername(username);
+        userRepository.followUser(loggedInUserUserId, userToFollow.getId());
+        return userToFollow;
+    }
+
+    public UserDTO.GetUserResponse unfollowUser(String username, Integer loggedInUserUserId) {
+        UserDTO.GetUserResponse userToUnfollow = getUserByUsername(username);
+        userRepository.unfollowUser(loggedInUserUserId, userToUnfollow.getId());
+        return userToUnfollow;
     }
 
     static class UserNotFoundException extends RuntimeException{

@@ -1,15 +1,16 @@
 package com.example.blogger.users;
 
+import com.example.blogger.articles.ArticleEntity;
 import com.example.blogger.common.BaseEntity;
 import lombok.*;
 import org.springframework.lang.NonNull;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
+import javax.persistence.*;
+import java.util.Set;
+
 @Builder
 @Getter
 @Setter
-@ToString
 @RequiredArgsConstructor
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,5 +30,13 @@ public class UserEntity extends BaseEntity {
 	private String password;
 
 	private String bio;
-	private String avatar;
+	private String image;
+
+	@ManyToMany(mappedBy = "fans", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	private Set<ArticleEntity> favorite;
+
+	@ManyToMany
+	@JoinTable(name = "user_followers")
+	private Set<UserEntity> followers;
+
 }

@@ -24,15 +24,15 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/articles")
 public class ArticlesController {
-    private final ArticleService articleService;
+    private final ArticleServiceImpl articleServiceImpl;
     ArticleObjectConverter articleObjectConverter;
     CommentObjectConverter commentObjectConverter;
 
     public ArticlesController(
-            ArticleService articleService,
+            ArticleServiceImpl articleServiceImpl,
             ArticleObjectConverter articleObjectConverter,
             CommentObjectConverter commentObjectConverter) {
-        this.articleService = articleService;
+        this.articleServiceImpl = articleServiceImpl;
         this.articleObjectConverter = articleObjectConverter;
         this.commentObjectConverter = commentObjectConverter;
     }
@@ -43,7 +43,7 @@ public class ArticlesController {
             @RequestParam(value = "offset", required = false, defaultValue = "0") int offset,
             @AuthenticationPrincipal UserEntity userEntity
     ) {
-        var article = articleService.getArticleFeed(userEntity, limit, offset);
+        var article = articleServiceImpl.getArticleFeed(userEntity, limit, offset);
         List<ArticleResponseDTO> articleResponseList = article.stream()
                 .map(x -> articleObjectConverter.entityToResponse(x))
                 .collect(Collectors.toList());
@@ -52,7 +52,7 @@ public class ArticlesController {
 
     @GetMapping(value = "/{slug}", produces = "application/json")
     ResponseEntity<ArticleResponseDTO> getArticleBySlug(@PathVariable(value = "slug") String slug) {
-        var article = articleService.getArticleBySlug(slug);
+        var article = articleServiceImpl.getArticleBySlug(slug);
         return ResponseEntity.ok(articleObjectConverter.entityToResponse(article));
     }
 
@@ -61,7 +61,7 @@ public class ArticlesController {
             @RequestBody ArticleCreateRequestDTO body,
             @AuthenticationPrincipal UserEntity userEntity
     ) {
-        var articleEntity = articleService.createArticle(
+        var articleEntity = articleServiceImpl.createArticle(
                 body.getArticle().getTitle(),
                 body.getArticle().getBody(),
                 body.getArticle().getDescription(),
@@ -77,7 +77,7 @@ public class ArticlesController {
             @RequestBody ArticleUpdateRequestDTO body,
             @AuthenticationPrincipal UserEntity userEntity
     ) {
-        ArticleEntity article = articleService.updateArticle(body.getArticle(), slug, userEntity);
+        ArticleEntity article = articleServiceImpl.updateArticle(body.getArticle(), slug, userEntity);
         return ResponseEntity.ok(articleObjectConverter.entityToResponse(article));
     }
 
@@ -86,7 +86,7 @@ public class ArticlesController {
             @PathVariable(value = "slug", required = true) String slug,
             @AuthenticationPrincipal UserEntity userEntity
     ) {
-        articleService.deleteArticleBySlug(slug, userEntity);
+        articleServiceImpl.deleteArticleBySlug(slug, userEntity);
         return ResponseEntity.ok(new GenericResponseDTO("Article Deleted"));
     }
 
@@ -96,7 +96,7 @@ public class ArticlesController {
             @RequestBody CommentCreateRequestDTO body,
             @AuthenticationPrincipal UserEntity userEntity
     ) {
-        CommentEntity response = articleService.addCommentToArticle(slug, body.getComment(), userEntity);
+        CommentEntity response = articleServiceImpl.addCommentToArticle(slug, body.getComment(), userEntity);
         return ResponseEntity.ok(commentObjectConverter.entityToResponse(response));
     }
 
@@ -104,7 +104,7 @@ public class ArticlesController {
     ResponseEntity<List<CommentDTO>> getCommentsFromArticle(
             @PathVariable(value = "slug", required = true) String slug
     ) {
-        List<CommentEntity> comments = articleService.getAllCommentBySlug(slug);
+        List<CommentEntity> comments = articleServiceImpl.getAllCommentBySlug(slug);
         return ResponseEntity.ok(commentObjectConverter.entityToResponse(comments));
     }
 
@@ -114,7 +114,7 @@ public class ArticlesController {
             @PathVariable(value = "id", required = true) int id,
             @AuthenticationPrincipal UserEntity userEntity
     ) {
-        articleService.deleteComment(id, userEntity);
+        articleServiceImpl.deleteComment(id, userEntity);
         return ResponseEntity.ok(new GenericResponseDTO("Comment deleted successfully."));
     }
 
@@ -123,7 +123,7 @@ public class ArticlesController {
             @PathVariable(value = "slug", required = true) String slug,
             @AuthenticationPrincipal UserEntity userEntity
     ) {
-        ArticleEntity articleEntity = articleService.favoriteArticle(slug, userEntity);
+        ArticleEntity articleEntity = articleServiceImpl.favoriteArticle(slug, userEntity);
         return ResponseEntity.ok(articleObjectConverter.entityToResponse(articleEntity));
     }
 
@@ -132,7 +132,7 @@ public class ArticlesController {
             @PathVariable(value = "slug", required = true) String slug,
             @AuthenticationPrincipal UserEntity userEntity
     ) {
-        ArticleEntity articleEntity = articleService.unfavoriteArticle(slug, userEntity);
+        ArticleEntity articleEntity = articleServiceImpl.unfavoriteArticle(slug, userEntity);
         return ResponseEntity.ok(articleObjectConverter.entityToResponse(articleEntity));
     }
 

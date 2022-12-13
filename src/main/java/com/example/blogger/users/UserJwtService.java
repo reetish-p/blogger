@@ -8,13 +8,14 @@ import java.util.Date;
 
 @Service
 public class UserJwtService {
+    //@Value("${environment.properties.usertoken.secret}")
+    private String secret ="abczyasdas2342384782342343dfgfd";
 
-    private static final String SECRET = "lkasdbas68asdas9asd8asd5a5sda7sd8asd8as";
     public static final String CLAIM_USERNAME = "username";
     public static final int JWT_EXPIRY_AGE = 1000 * 60 * 60 * 24 * 7; // 1 week
-    Algorithm algorithm = Algorithm.HMAC256(SECRET);
 
     public String createJwtToken(String username){
+        Algorithm algorithm = Algorithm.HMAC256(secret);;
         return JWT.create()
                 .withClaim(CLAIM_USERNAME,username)
                 .withIssuedAt(new Date())
@@ -23,6 +24,7 @@ public class UserJwtService {
     }
     public String getUsernameFromJwtToken(String jwtToken)
     {
+        Algorithm algorithm = Algorithm.HMAC256(secret);;
         return JWT.require(algorithm)
                 .build()
                 .verify(jwtToken)

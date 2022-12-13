@@ -2,7 +2,7 @@ package com.example.blogger.security;
 
 import com.example.blogger.users.UserEntity;
 import com.example.blogger.users.UserJwtService;
-import com.example.blogger.users.UsersService;
+import com.example.blogger.users.UserServiceImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -11,11 +11,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class JWTAuthManager implements AuthenticationManager {
     private final UserJwtService userJwtService;
-    private final UsersService usersService;
+    private final UserServiceImpl userServiceImpl;
 
-    public JWTAuthManager(UserJwtService userJwtService, UsersService usersService) {
+    public JWTAuthManager(UserJwtService userJwtService, UserServiceImpl userServiceImpl) {
         this.userJwtService = userJwtService;
-        this.usersService = usersService;
+        this.userServiceImpl = userServiceImpl;
     }
 
     @Override
@@ -25,7 +25,7 @@ public class JWTAuthManager implements AuthenticationManager {
 
         String token = jwtAuthentication.getCredentials();
         String username = userJwtService.getUsernameFromJwtToken(token);
-        UserEntity user = usersService.getUserEntityByUsername(username);
+        UserEntity user = userServiceImpl.getUserEntityByUsername(username);
         jwtAuthentication.setUserEntity(user);
         return jwtAuthentication;
     }

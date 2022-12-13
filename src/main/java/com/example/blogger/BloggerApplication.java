@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+
 @SpringBootApplication
 @EnableJpaAuditing
 public class BloggerApplication {
@@ -18,10 +19,12 @@ public class BloggerApplication {
 
     @Bean
     public ModelMapper modelMapper(){
+
         return new ModelMapper();
     }
     @Bean
     public PasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
     }
+
 }

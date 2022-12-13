@@ -6,13 +6,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UsersService {
+public class UserServiceImpl implements UserService{
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final UserJwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
-    public UsersService(UserRepository userRepository, ModelMapper modelMapper, UserJwtService jwtService, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper, UserJwtService jwtService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
         this.jwtService = jwtService;
@@ -20,7 +20,6 @@ public class UsersService {
     }
 
     public  UserDTO.LoginUserResponse signUpUser(UserDTO.CreateUserRequest user){
-        //TODO: validate invalid inputs
         UserEntity userEntity = modelMapper.map(user,UserEntity.class);
         userEntity.setPassword(passwordEncoder.encode(user.getPassword()));
         UserEntity savedUser = userRepository.save(userEntity);
